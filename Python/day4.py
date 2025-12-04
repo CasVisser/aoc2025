@@ -17,18 +17,16 @@ if len(sys.argv) > 1 and (sys.argv[1] == "gd" or sys.argv[1] == "s1" or sys.argv
 
 ### BEGIN SOLUTION
 
-from collections import defaultdict
-
 part1 = part2 = 0
 grid = {complex(x, y): c 
         for y, line in enumerate(inp.split("\n"))
         for x, c in enumerate(line)
         if c == "@"}
 directions = [1, 1 + 1j, 1j, -1 + 1j, -1, -1 - 1j, -1j, 1 - 1j] 
+neighbors = lambda xy: [xy + d for d in directions if xy + d in grid]
 
 while True:
-    removable = [xy for xy in grid 
-                 if len([xy + d for d in directions if xy + d in grid]) < 4]
+    removable = [xy for xy in grid if len(neighbors(xy)) < 4]
 
     if len(removable) == 0:
         break
