@@ -29,40 +29,31 @@ if len(sys.argv) > 1 and (sys.argv[1] == "gd" or sys.argv[1] == "s1" or sys.argv
 
 ### BEGIN SOLUTION
 
-from collections import defaultdict
 from itertools import combinations
 from heapq import heappush, heappop
-from math import inf, prod, sqrt
+from math import prod, sqrt
 
-part1 = part2 = 0
+
 boxes = list(map(lambda line: tuple(map(int, line.split(","))), inp.split("\n")))
 pairs = []
 for b1, b2 in combinations(boxes, 2):
     dist = sqrt(sum(map(lambda x, y: (y - x)**2, b1, b2)))
     heappush(pairs, (dist, b1, b2))
 
-neighbors = defaultdict(set)
-for _ in range(n_connections):
-    d, b1, b2 = heappop(pairs)
-    neighbors[b1].add(b2)
-    neighbors[b2].add(b1)
+networks = {box: frozenset([box]) for box in boxes}
+i = 0
+while True:
+    if i == n_connections:
+        part1 = prod(sorted(list(map(len, set(networks.values()))))[-3:])
+    i += 1
+    _, b1, b2 = heappop(pairs)
+    new_network = networks[b1] | networks[b2]
+    for b in new_network:
+        networks[b] = new_network
+    if len(set(networks.values())) == 1:
+        break
 
-networks = []
-seen = set()
-for box in boxes:
-    if box in seen:
-        continue
-    seen.add(box)
-    network = set()
-    q = {box}
-    while q:
-        cur = q.pop()
-        network |= neighbors[cur]
-        q |= neighbors[cur] - seen
-        seen |= neighbors[cur]
-    networks.append(network)
-
-part1 = prod(sorted(list(map(len, networks)))[-3:])
+part2 = b1[0] * b2[0]
 
 
 ### END SOLUTION
